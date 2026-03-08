@@ -1,0 +1,132 @@
+
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أثير - المساعد الصوتي | ByATM</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@400;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <link rel="stylesheet" href="https://ia600907.us.archive.org/16/items/atheer_202603/style.css">
+</head>
+<body>
+
+    <div id="splash-screen">
+        <div class="splash-app-name">أثيــــر</div>
+        <div class="splash-logo">Atheer Voice AI</div>
+        <div class="splash-name">أحمد طه مهنا | ByATM</div>
+        <div class="splash-url">atmo90.com</div>
+        <div class="loader-bar"></div>
+    </div>
+
+    <div class="main-wrapper">
+        <header>
+            <div class="logo"><i class="fa-solid fa-microphone-lines"></i> <span id="app-title">أثير | ByATM</span></div>
+            <div class="header-controls">
+                <button id="lang-btn" onclick="toggleLanguage()"><i class="fa-solid fa-language"></i> <span id="lang-text">English</span></button>
+                <button id="theme-btn" onclick="toggleTheme()"><i class="fa-solid fa-moon"></i> <span id="theme-text">ليلي</span></button>
+            </div>
+        </header>
+
+        <main class="panel">
+            <div class="panel-header">
+                <div><i class="fa-solid fa-ear-listen"></i> <span id="live-title">المايك يسمع الآن...</span></div>
+            </div>
+            <div id="live-text">سيظهر هنا ما يسمعه المايك فوراً...</div>
+        </main>
+
+        <main class="panel">
+            <div class="panel-header">
+                <div><i class="fa-solid fa-pen-nib"></i> <span id="final-title">النص النهائي</span></div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);" id="word-counter">الكلمات: 0 | الحروف: 0</div>
+            </div>
+            
+            <div class="controls-row">
+                <div class="custom-dropdown">
+                    <div class="dropdown-selected" onclick="toggleDropdown('font-options')">
+                        <span id="selected-font-text"><i class="fa-solid fa-font"></i> خط تجوال</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="dropdown-options" id="font-options">
+                        <div class="dropdown-item" onclick="selectFont('Tajawal', 'خط تجوال')">خط تجوال (عصري)</div>
+                        <div class="dropdown-item" onclick="selectFont('Cairo', 'خط كايرو')">خط كايرو (واضح)</div>
+                        <div class="dropdown-item" onclick="selectFont('Amiri', 'خط أميري')">خط أميري (رسمي)</div>
+                        <div class="dropdown-item" onclick="selectFont('Arial', 'خط أساسي')">خط أساسي</div>
+                    </div>
+                </div>
+
+                <div class="engine-switch" title="التبديل بين الذكاء الاصطناعي السحابي وصوت الكمبيوتر">
+                    <i class="fa-solid fa-robot" style="color: var(--primary)" id="ai-icon"></i>
+                    <span id="engine-label">AI سحابي</span>
+                    <label class="switch">
+                        <input type="checkbox" id="ai-toggle" checked onchange="toggleVoiceEngine()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="custom-dropdown" id="native-voice-container" style="display: none; min-width: 140px;">
+                    <div class="dropdown-selected" onclick="toggleDropdown('voice-options')">
+                        <span id="selected-voice-text"><i class="fa-solid fa-headset"></i> الكمبيوتر</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="dropdown-options" id="voice-options"></div>
+                </div>
+
+                <div class="speed-control" title="سرعة القراءة">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <input type="range" id="rate-slider" min="0.5" max="2" value="1" step="0.1" oninput="updateRateLabel()">
+                    <span id="rate-label">1.0</span>
+                </div>
+
+                <div class="speed-control" id="pitch-container" style="display: none;" title="تغيير نبرة الصوت (رجل غليظ / ست أو طفل)">
+                    <i class="fa-solid fa-wave-square"></i>
+                    <input type="range" id="pitch-slider" min="0" max="2" value="1" step="0.1" oninput="updatePitchLabel()">
+                    <span id="pitch-label">1.0</span>
+                </div>
+            </div>
+
+            <textarea id="final-text" placeholder="النص المكتمد سيظهر هنا ويمكنك الكتابة فيه يدوياً..." oninput="updateCounterAndSave(true)"></textarea>
+            
+            <div class="toolbar">
+                <div class="tools-group">
+                    <button onclick="copyText()"><i class="fa-regular fa-copy"></i></button>
+                    <button onclick="undoText()" class="btn-warning" title="تراجع"><i class="fa-solid fa-rotate-left"></i> <span id="undo-text">تراجع</span></button>
+                    <button onclick="clearText()" class="btn-danger" title="تصفير"><i class="fa-solid fa-trash-can"></i> <span id="clear-text">تصفير</span></button>
+                </div>
+                <div class="tools-group">
+                    <button onclick="speakText()" class="btn-primary" id="listen-btn"><i class="fa-solid fa-volume-high"></i> <span id="listen-text">استماع</span></button>
+                    <button onclick="downloadAudio()" class="btn-success" id="download-btn" title="تحميل الصوت كملف MP3"><i class="fa-solid fa-cloud-arrow-down"></i></button>
+                    <button onclick="translateText()" class="btn-success"><i class="fa-solid fa-language"></i></button>
+                    <button onclick="addTashkeel()" class="btn-warning" title="تشكيل عشوائي للاستعراض"><i class="fa-solid fa-feather"></i></button>
+                    <button onclick="addTazyeen()" class="btn-purple"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                    <button onclick="exportWord()" class="btn-primary"><i class="fa-solid fa-file-word"></i></button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="fixed-mic-container">
+        <button id="smart-btn" class="record-btn smart-btn" onclick="toggleRecording('smart')" title="تسجيل ذكي (بالتشكيل والهمزات)">
+            <i class="fa-solid fa-feather-pointed"></i>
+        </button>
+
+        <button id="mic-btn" class="record-btn mic-btn" onclick="toggleRecording('normal')" title="تسجيل عادي (خام)">
+            <i class="fa-solid fa-microphone"></i>
+        </button>
+    </div>
+
+    <footer>
+        <div class="footer-brand">ByATM © 2026</div>
+        <div>تم التطوير بواسطة أحمد طه مهنا | نظام أثير للمساعد الصوتي الذكي</div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
